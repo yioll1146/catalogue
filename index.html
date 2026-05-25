@@ -3,98 +3,106 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title> petit moments ｜ 生活中的随机走神 </title>
+  <title>petit moments ｜ 生活中的随机走神</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
-    body { background-color: #f9f9f9; }
-    .sold-out::after {
-      content: "SOLD OUT";
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0,0,0,0.6);
-      color: white;
-      padding: 0.5rem 1rem;
-      font-size: 1.25rem;
-      letter-spacing: 2px;
+    /* 复刻 Studio Mantel 的核心衬线字体与优雅背景 */
+    body { 
+      background-color: #FBFBFA; /* 带着极淡淡暖调的白，比纯白更有复古纸张质感 */
+      font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", "Noto Serif SC", serif;
+      -webkit-font-smoothing: antialiased;
     }
+    
+    /* 隐藏滚动条但保留滚动功能（用于详情页多图） */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* 优雅的弹窗渐入动画 */
     .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-    .modal.active { display: flex; }
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
   </style>
 </head>
-<body class="text-gray-800">
+<body class="text-[#222222] antialiased">
 
-  <header class="text-center py-8">
-    <h1 class="text-3xl font-light tracking-wide"> petit moments ｜ 生活中的随机走神 </h1>
-    <p class="text-sm text-gray-500 mt-2"> 中古 • 银饰 • 摆件 • 玩具 </p>
+  <header class="border-b border-[#EAEAE8] py-10 px-6 tracking-widest text-center">
+    <div class="max-w-6xl mx-auto">
+      <a href="#" class="text-2xl font-light uppercase tracking-[0.3em] inline-block mb-3 hover:opacity-70 transition">
+        petit moments
+      </a>
+      <div class="h-[1px] w-12 bg-[#222222] mx-auto my-4"></div>
+      <p class="text-xs uppercase text-gray-400 tracking-[0.2em]">生活中的随机走神</p>
+      
+      <nav class="mt-8 flex justify-center gap-8 text-xs uppercase text-gray-500 tracking-wider">
+        <span class="text-[#222222] border-b border-[#222222] pb-1">Jewellery / </span>
+      </nav>
+    </div>
   </header>
 
-  <main id="product-container" class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-4 pb-12"></main>
+  <main class="max-w-6xl mx-auto px-6 pt-16 pb-32">
+    <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-20">
+      </div>
+  </main>
 
-  <div id="modal" class="modal">
-    <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full relative p-6 m-4">
-      <button id="closeModal" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-      <div id="modalContent"></div>
+  <footer class="border-t border-[#EAEAE8] py-12 text-center text-xs text-gray-400 tracking-widest uppercase">
+    &copy; petit moments. All unique pieces.
+  </footer>
+
+  <div id="modal" class="modal fixed inset-0 bg-black/40 backdrop-blur-[2px] flex justify-center align-middle items-center z-50 p-4">
+    <div class="absolute inset-0" id="modalBg"></div>
+    
+    <div class="bg-[#FBFBFA] rounded-none shadow-2xl max-w-3xl w-full relative p-8 md:p-12 z-10 max-h-[90vh] overflow-y-auto no-scrollbar">
+      <button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-[#222222] text-xl font-light transition tracking-widest">&times; CLOSE</button>
+      <div id="modalContent" class="mt-4"></div>
     </div>
   </div>
 
   <script>
-    // 1. 修复了这里的换行语法错误
+    // ⚠️【请确保这一行换成你真实的 Google Sheets 公开 CSV 链接】
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdeGdOivY5ATsUWSBizx2Xu5fYHnMmtFnl3_SXA0hyH1nbMzOIdrTcCEeHyoP--74hlvWBNnD36JKf/pub?gid=9534908&single=true&output=csv";
 
-    // 解析 CSV 并渲染
+    // 解析 CSV 并在页面渲染
     Papa.parse(csvUrl, {
       download: true,
       header: true,
-      skipEmptyLines: true, // 自动跳过空行，防止报错
+      skipEmptyLines: true,
       error: function(err) {
-        // 诊断提示 1：链接或权限问题
-        alert("【无法读取表格】请检查：1. Google表格是否真的点击了‘发布’ 2. 链接有没有复制完整。");
-        console.error(err);
+        console.error("数据加载失败:", err);
       },
       complete: function(results) {
-        console.log("成功读取到表格数据：", results.data);
-
-        // 2. 增加防空保护逻辑
         const data = results.data.filter(row => row && row.标题 && row.图片);
-        
-        // 诊断提示 2：列名对不上问题
-        if (results.data.length > 0 && data.length === 0) {
-          alert("【列名不匹配】成功读到了表格，但是没找到叫‘标题’和‘图片’的列！请检查表格第一行是不是这两个词。");
-        }
-
         const container = document.getElementById("product-container");
-        container.innerHTML = ""; // 清空老容器
+        container.innerHTML = ""; 
 
         data.forEach(item => {
           const soldOut = item.状态 && item.状态.trim() === "已售罄";
           const card = document.createElement("div");
-          card.className = "relative bg-white rounded-lg shadow hover:shadow-lg overflow-hidden transition cursor-pointer";
+          // 去除所有圆角和投影，改为完全平面的高级画册感
+          card.className = "group relative cursor-pointer flex flex-col justify-between overflow-hidden";
           
-          // 防止没有图片链接时报错裂开
-          const firstImg = item.图片 ? item.图片.split(',')[0].trim() : "https://placehold.co/600x400?text=暂无图片";
+          const firstImg = item.图片 ? item.图片.split(',')[0].trim() : "";
 
           card.innerHTML = `
-            <div class="relative ${soldOut ? 'opacity-50 grayscale' : ''}">
-              <img src="${firstImg}" alt="${item.标题}" class="w-full h-64 object-cover" onerror="this.src='https://placehold.co/600x400?text=图片加载失败'"/>
-              ${soldOut ? '<div class="sold-out"></div>' : ''}
+            <div class="w-full aspect-[4/5] bg-[#F2F2F0] overflow-hidden relative mb-4">
+              <img src="${firstImg}" alt="${item.标题}" 
+                   class="w-full h-full object-cover transition-transform duration-[1.2s] cubic-bezier(0.25, 0.46, 0.45, 0.94) group-hover:scale-105 ${soldOut ? 'opacity-60' : ''}" 
+                   onerror="this.src='https://placehold.co/600x750/F2F2F0/888888?text=IMAGE+LOADING'"/>
             </div>
-            <div class="p-4 text-center">
-              <h2 class="text-lg font-medium mb-1">${item.标题}</h2>
-              <p class="text-gray-500 font-medium">${item.价格 || ''}</p>
+            <div class="flex flex-col items-center text-center">
+              <h2 class="text-sm font-light tracking-wide text-[#222222] mb-1 group-hover:text-gray-500 transition-colors duration-300 px-2 line-clamp-2">${item.标题}</h2>
+              <div class="text-xs tracking-widest text-gray-500 font-light">
+                ${soldOut ? `<span class="text-gray-300 line-through mr-1">${item.价格 || ''}</span> <span class="text-red-800 italic font-normal">(Sold)</span>` : `<span>${item.价格 || ''}</span>`}
+              </div>
             </div>
           `;
 
-          // 绑定点击事件
           card.addEventListener('click', () => openModal(item));
           container.appendChild(card);
         });
@@ -105,26 +113,41 @@
     const modal = document.getElementById('modal');
     const modalContent = document.getElementById('modalContent');
     const closeModalBtn = document.getElementById('closeModal');
+    const modalBg = document.getElementById('modalBg');
 
     function openModal(item) {
       if (!item.图片) return;
       const imgs = item.图片.split(',').map(u => u.trim());
-      modalContent.innerHTML = `
-        <h2 class="text-2xl font-light mb-4 text-center">${item.标题}</h2>
-        <div class="flex overflow-x-auto gap-4 mb-4 scrollbar-thin">
-          ${imgs.map(url => `<img src="${url}" class="h-64 rounded-lg object-cover flex-shrink-0" onerror="this.src='https://placehold.co/600x400?text=图片裂开'"/>`).join('')}
-        </div>
-        <p class="text-center text-lg text-amber-800 font-medium mb-2">${item.价格 || ''}</p>
-        <p class="text-center text-sm ${item.状态 === '已售罄' ? 'text-red-500' : 'text-green-600'}">${item.状态 || ''}</p>
-        <p class="mt-4 text-sm text-gray-600 bg-gray-50 p-3 rounded leading-relaxed">${item.详情 || '暂无详细介绍'}</p>
-      `;
-      modal.classList.add('active');
-    }
+      const soldOut = item.状态 && item.状态.trim() === "已售罄";
 
-    closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
-    modal.addEventListener('click', e => {
-      if (e.target === modal) modal.classList.remove('active');
-    });
-  </script>
-</body>
-</html>
+      modalContent.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          <div class="flex flex-col gap-4 max-h-[60vh] overflow-y-auto no-scrollbar pr-1">
+            ${imgs.map(url => `
+              <div class="bg-[#F2F2F0] aspect-[4/5] w-full">
+                <img src="${url}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x750/F2F2F0/888888?text=IMAGE+ERROR'"/>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div class="flex flex-col justify-between h-full py-2">
+            <div>
+              <h2 class="text-xl font-light tracking-widest text-[#222222] mb-4 leading-relaxed">${item.标题}</h2>
+              <div class="text-md font-light tracking-widest mb-6 pb-4 border-b border-[#EAEAE8]">
+                ${soldOut ? `<span class="text-gray-300 line-through">${item.价格 || ''}</span> <span class="text-red-800 ml-2 italic text-sm">(Sold Out / 已售罄)</span>` : `<span class="text-gray-800">${item.价格 || ''}</span>`}
+              </div>
+              <div class="text-xs tracking-wider text-gray-500 leading-relaxed font-light whitespace-pre-line bg-[#F5F5F3] p-4">
+                ${item.详情 || 'No further description available / 暂无详细描述'}
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <div class="w-full text-center border border-[#222222] py-3 text-xs tracking-widest uppercase font-light bg-[#222222] text-white">
+                ${soldOut ? 'PIECE SOLD OUT / 已售罄' : 'INQUIRE VIA WECHAT / 微信咨询购买'}
+              </div>
+              <p class="text-[11px] text-gray-400 tracking-wider text-center mt-2 italic">中古商品独一无二，请截图联系微信确认细节</p>
+            </div>
+          </div>
+        </div>
+      `;
+      modal.classList.add('
