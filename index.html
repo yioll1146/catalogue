@@ -33,47 +33,64 @@
 </head>
 <body class="text-gray-800">
 
-  <!-- 头部 -->
   <header class="text-center py-8">
     <h1 class="text-3xl font-light tracking-wide"> petit moments ｜ 生活中的随机走神 </h1>
     <p class="text-sm text-gray-500 mt-2"> 中古 • 银饰 • 摆件 • 玩具 </p>
   </header>
 
-  <!-- 主容器 -->
   <main id="product-container" class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-4 pb-12"></main>
 
-  <!-- 弹窗 -->
   <div id="modal" class="modal">
-    <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full relative p-6">
+    <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full relative p-6 m-4">
       <button id="closeModal" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
       <div id="modalContent"></div>
     </div>
   </div>
 
   <script>
-    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdeGdOivY5ATsUWSBizx2Xu5fYHnMmtFnl3_SXA0hyH1nbMzOIdrTcCEeHyoP--74hlvWBNnD36JKf/pub?gid=9534908&single=true&output=csv
-";
+    // 1. 修复了这里的换行语法错误
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdeGdOivY5ATsUWSBizx2Xu5fYHnMmtFnl3_SXA0hyH1nbMzOIdrTcCEeHyoP--74hlvWBNnD36JKf/pub?gid=9534908&single=true&output=csv";
 
     // 解析 CSV 并渲染
     Papa.parse(csvUrl, {
       download: true,
       header: true,
+      skipEmptyLines: true, // 自动跳过空行，防止报错
+      error: function(err) {
+        // 诊断提示 1：链接或权限问题
+        alert("【无法读取表格】请检查：1. Google表格是否真的点击了‘发布’ 2. 链接有没有复制完整。");
+        console.error(err);
+      },
       complete: function(results) {
-        const data = results.data.filter(row => row.标题 && row.图片);
+        console.log("成功读取到表格数据：", results.data);
+
+        // 2. 增加防空保护逻辑
+        const data = results.data.filter(row => row && row.标题 && row.图片);
+        
+        // 诊断提示 2：列名对不上问题
+        if (results.data.length > 0 && data.length === 0) {
+          alert("【列名不匹配】成功读到了表格，但是没找到叫‘标题’和‘图片’的列！请检查表格第一行是不是这两个词。");
+        }
+
         const container = document.getElementById("product-container");
+        container.innerHTML = ""; // 清空老容器
 
         data.forEach(item => {
           const soldOut = item.状态 && item.状态.trim() === "已售罄";
           const card = document.createElement("div");
           card.className = "relative bg-white rounded-lg shadow hover:shadow-lg overflow-hidden transition cursor-pointer";
+          
+          // 防止没有图片链接时报错裂开
+          const firstImg = item.图片 ? item.图片.split(',')[0].trim() : "https://placehold.co/600x400?text=暂无图片";
+
           card.innerHTML = `
-            <div class="relative ${soldOut ? 'opacity-70 grayscale pointer-events-none' : ''}">
-              <img src="${item.图片.split(',')[0].trim()}" alt="${item.标题}" class="w-full h-64 object-cover" />
+            <div class="relative ${soldOut ? 'opacity-50 grayscale' : ''}">
+              <img src="${firstImg}" alt="${item.标题}" class="w-full h-64 object-cover" onerror="this.src='https://placehold.co/600x400?text=图片加载失败'"/>
               ${soldOut ? '<div class="sold-out"></div>' : ''}
             </div>
             <div class="p-4 text-center">
               <h2 class="text-lg font-medium mb-1">${item.标题}</h2>
-              <p class="text-gray-500">${item.价格 || ''}</p>
+              <p class="text-gray-500 font-medium">${item.价格 || ''}</p>
             </div>
           `;
 
@@ -90,15 +107,16 @@
     const closeModalBtn = document.getElementById('closeModal');
 
     function openModal(item) {
+      if (!item.图片) return;
       const imgs = item.图片.split(',').map(u => u.trim());
       modalContent.innerHTML = `
         <h2 class="text-2xl font-light mb-4 text-center">${item.标题}</h2>
-        <div class="flex overflow-x-auto gap-4 mb-4">
-          ${imgs.map(url => `<img src="${url}" class="h-64 rounded-lg object-cover flex-shrink-0" />`).join('')}
+        <div class="flex overflow-x-auto gap-4 mb-4 scrollbar-thin">
+          ${imgs.map(url => `<img src="${url}" class="h-64 rounded-lg object-cover flex-shrink-0" onerror="this.src='https://placehold.co/600x400?text=图片裂开'"/>`).join('')}
         </div>
-        <p class="text-center text-lg text-gray-700 mb-2">${item.价格 || ''}</p>
-        <p class="text-center text-gray-500">${item.状态 || ''}</p>
-        <p class="mt-4 text-sm text-gray-600">${item.详情 || ''}</p>
+        <p class="text-center text-lg text-amber-800 font-medium mb-2">${item.价格 || ''}</p>
+        <p class="text-center text-sm ${item.状态 === '已售罄' ? 'text-red-500' : 'text-green-600'}">${item.状态 || ''}</p>
+        <p class="mt-4 text-sm text-gray-600 bg-gray-50 p-3 rounded leading-relaxed">${item.详情 || '暂无详细介绍'}</p>
       `;
       modal.classList.add('active');
     }
