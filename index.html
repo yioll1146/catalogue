@@ -7,23 +7,18 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
-    /* 严格复刻 Studio Mantel 的核心衬线字体与微暖背景色 */
     body { 
       background-color: #FDFDFD; 
       font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", "Noto Serif SC", serif;
       -webkit-font-smoothing: antialiased;
     }
     
-    /* 隐藏详情页平铺图片的滚动条 */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* 优雅的黑框按钮淡入效果 */
     .inquire-btn {
       transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-
-    /* 弹窗渐入动画 */
     .modal {
       opacity: 0;
       pointer-events: none;
@@ -69,7 +64,6 @@
   </div>
 
   <script>
-    // 请确保这一行是你的 Google Sheets 公开 CSV 链接
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdeGdOivY5ATsUWSBizx2Xu5fYHnMmtFnl3_SXA0hyH1nbMzOIdrTcCEeHyoP--74hlvWBNnD36JKf/pub?gid=9534908&single=true&output=csv";
 
     Papa.parse(csvUrl, {
@@ -86,13 +80,10 @@
           const soldOut = item.状态 && item.状态.trim() === "已售罄";
           const card = document.createElement("div");
           
-          // group 用于触发鼠标悬停时内部图片的平滑放大动作
           card.className = "group flex flex-col justify-between overflow-hidden bg-transparent rounded-none shadow-none";
           
           const firstImg = item.图片 ? item.图片.split(',')[0].trim() : "";
 
-          // 这里是精髓：完美的 3:4 竖图布局，图片无圆角。
-          // 下方文字采用 flex-row justify-between，让标题在左，价格在右，完美还原 Studio Mantel。
           card.innerHTML = `
             <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-4 rounded-none">
               <img src="${firstImg}" alt="${item.标题}" 
@@ -124,7 +115,6 @@
       const imgs = item.图片.split(',').map(u => u.trim());
       const soldOut = item.状态 && item.状态.trim() === "已售罄";
 
-      // 弹窗内部同样复刻 Studio Mantel 的左右平铺大图排版
       modalContent.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
           <div class="flex flex-col gap-6 max-h-[70vh] overflow-y-auto no-scrollbar pr-1">
