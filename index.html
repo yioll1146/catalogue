@@ -7,47 +7,80 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
+    /* 严格复刻 Studio Mantel 的核心衬线字体与微暖背景色 */
     body { 
       background-color: #FDFDFD; 
       font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", "Noto Serif SC", serif;
       -webkit-font-smoothing: antialiased;
     }
     
+    /* 隐藏详情页平铺图片的滚动条 */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    .inquire-btn {
-      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
+    /* 优雅的黑框按钮过渡效果 */
+    .inquire-btn { transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+
+    /* 弹窗渐入动画 */
     .modal {
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-    .modal.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .modal.active { opacity: 1; pointer-events: auto; }
+    
+    /* 多页面切换的隐藏/显示逻辑 */
+    .page-content { display: none; }
+    .page-content.active { display: block; }
+    
+    /* 导航激活状态：加一条利落的底线 */
+    .nav-link.active { border-bottom: 1px solid #111111; color: #111111; }
   </style>
 </head>
 <body class="text-[#111111] antialiased">
 
   <header class="py-16 px-6 text-center">
     <div class="max-w-6xl mx-auto">
-      <a href="#" class="text-2xl font-light uppercase tracking-[0.4em] inline-block mb-2 text-[#111111] hover:opacity-60 transition">
+      <a href="#" onclick="switchPage('jewellery')" class="text-2xl font-light uppercase tracking-[0.4em] inline-block mb-2 text-[#111111] hover:opacity-60 transition">
         petit moments
       </a>
       <p class="text-[10px] uppercase text-gray-400 tracking-[0.25em] mt-2">生活中的随机走神</p>
       
-      <nav class="mt-12 flex justify-center text-xs uppercase tracking-[0.2em] text-[#111111] font-light">
-        <span class="border-b border-[#111111] pb-1 cursor-pointer">Jewellery</span>
+      <nav class="mt-12 flex justify-center gap-8 md:gap-12 text-xs uppercase tracking-[0.2em] text-gray-400 font-light">
+        <button onclick="switchPage('jewellery')" id="nav-jewellery" class="nav-link pb-1 hover:text-[#111111] transition duration-300">Jewellery</button>
+        <button onclick="switchPage('objects')" id="nav-objects" class="nav-link pb-1 hover:text-[#111111] transition duration-300">Objects</button>
+        <button onclick="switchPage('archive')" id="nav-archive" class="nav-link pb-1 hover:text-[#111111] transition duration-300">Archive</button>
+        <button onclick="switchPage('about')" id="nav-about" class="nav-link pb-1 hover:text-[#111111] transition duration-300">About</button>
       </nav>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-6 pt-8 pb-32">
+  <main id="store-page" class="page-content active max-w-6xl mx-auto px-6 pt-8 pb-32">
     <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-12 gap-y-20">
       </div>
+  </main>
+
+  <main id="about-page" class="page-content max-w-2xl mx-auto px-6 pt-12 pb-32 text-center font-light">
+    <div class="flex flex-col items-center">
+      <h3 class="text-sm tracking-[0.2em] uppercase mb-6 text-gray-600">关于 petit moments</h3>
+      <p class="text-xs tracking-[0.2em] leading-loose text-gray-500 mb-12 max-w-md">
+        生活中的随机走神。<br>
+        我们搜集带有时间痕迹的中古银饰、古董摆件与带有拙感的玩具。<br>
+        每一件器物都是时间的孤品，静静等待下一个懂得它光泽的主人。
+      </p>
+      
+      <div class="w-full h-[1px] bg-gray-100 my-8"></div>
+      
+      <h3 class="text-sm tracking-[0.2em] uppercase mb-6 text-gray-600">CONTACT & INQUIRE</h3>
+      <p class="text-[10px] tracking-widest text-gray-400 mb-6 uppercase">扫码或添加微信号与我们联络</p>
+      
+      <div class="w-40 h-40 bg-[#F5F5F3] p-2 mb-6 border border-gray-100">
+        <img src="https://placehold.co/400x400/F5F5F3/111111?text=WECHAT+QR" alt="微信二维码" class="w-full h-full object-cover">
+      </div>
+      
+      <p class="text-sm tracking-widest text-[#111111] font-mono select-all">WeChat ID: <span class="underline font-sans">你的微信号</span></p>
+      <p class="text-[10px] text-gray-400 tracking-wider mt-3 italic">添加时请备注 “网站选物”</p>
+    </div>
   </main>
 
   <footer class="py-16 text-center text-[10px] text-gray-400 tracking-[0.2em] uppercase border-t border-gray-100">
@@ -56,7 +89,6 @@
 
   <div id="modal" class="modal fixed inset-0 bg-black/30 backdrop-blur-[1px] flex justify-center items-center z-50 p-4">
     <div class="absolute inset-0" id="modalBg"></div>
-    
     <div class="bg-[#FDFDFD] rounded-none shadow-xl max-w-4xl w-full relative p-6 md:p-10 z-10 max-h-[85vh] overflow-y-auto no-scrollbar">
       <button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-[#111111] text-xs font-light tracking-widest transition">&times; CLOSE</button>
       <div id="modalContent" class="mt-4"></div>
@@ -64,47 +96,108 @@
   </div>
 
   <script>
+    // ⚠️【核心】在此替换为你发布的 Google Sheets CSV 链接
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdeGdOivY5ATsUWSBizx2Xu5fYHnMmtFnl3_SXA0hyH1nbMzOIdrTcCEeHyoP--74hlvWBNnD36JKf/pub?gid=9534908&single=true&output=csv";
 
+    let globalProducts = []; // 全局货品数据库缓存
+
+    // 初始化：拉取并解析 CSV
     Papa.parse(csvUrl, {
       download: true,
       header: true,
       skipEmptyLines: true,
       error: function(err) { console.error("数据加载失败:", err); },
       complete: function(results) {
-        const data = results.data.filter(row => row && row.标题 && row.图片);
-        const container = document.getElementById("product-container");
-        container.innerHTML = ""; 
-
-        data.forEach(item => {
-          const soldOut = item.状态 && item.状态.trim() === "已售罄";
-          const card = document.createElement("div");
-          
-          card.className = "group flex flex-col justify-between overflow-hidden bg-transparent rounded-none shadow-none";
-          
-          const firstImg = item.图片 ? item.图片.split(',')[0].trim() : "";
-
-          card.innerHTML = `
-            <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-4 rounded-none">
-              <img src="${firstImg}" alt="${item.标题}" 
-                   class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.03] ${soldOut ? 'opacity-50' : ''}" 
-                   onerror="this.src='https://placehold.co/600x800/F5F5F3/888888?text=IMAGE+LOADING'"/>
-            </div>
-            <div class="flex justify-between items-start text-xs tracking-wide px-1">
-              <h2 class="font-light text-[#111111] max-w-[70%] text-left leading-relaxed">${item.标题}</h2>
-              <div class="text-right font-light pl-2 shrink-0">
-                ${soldOut ? `<span class="text-red-800 italic font-normal text-[11px]">(Sold)</span>` : `<span>${item.价格 || ''}</span>`}
-              </div>
-            </div>
-          `;
-
-          card.addEventListener('click', () => openModal(item));
-          container.appendChild(card);
-        });
+        // 核心安全防护：确保这一行有标题和图片数据才渲染
+        globalProducts = results.data.filter(row => row && row.标题 && row.图片);
+        // 默认载入首页 Jewellery
+        switchPage('jewellery');
       }
     });
 
-    // 弹窗逻辑
+    // 核心路由控制器：负责处理多页面分流与导航高亮
+    function switchPage(pageName) {
+      // 1. 更新导航栏高亮状态
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      const activeNav = document.getElementById(`nav-${pageName}`);
+      if(activeNav) activeNav.classList.add('active');
+
+      // 2. 页面容器显隐逻辑
+      const storePage = document.getElementById('store-page');
+      const aboutPage = document.getElementById('about-page');
+      
+      if (pageName === 'about') {
+        storePage.classList.remove('active');
+        aboutPage.classList.add('active');
+        return; // About 是静态页，直接在这里拦截，不需要渲染商品
+      } else {
+        storePage.classList.add('active');
+        aboutPage.classList.remove('active');
+      }
+
+      // 3. 严格的多条件分流过滤引擎
+      let filteredData = [];
+      
+      if (pageName === 'jewellery') {
+        // 页面一条件：分类含 珠宝/银饰/jewellery 且 状态不是已售罄
+        filteredData = globalProducts.filter(item => {
+          const cate = String(item.分类 || '').toLowerCase();
+          const status = String(item.状态 || '').trim();
+          return (cate.includes('珠宝') || cate.includes('银饰') || cate.includes('jewellery')) && status !== '已售罄';
+        });
+      } else if (pageName === 'objects') {
+        // 页面二条件：分类含 摆件/玩具/objects 且 状态不是已售罄
+        filteredData = globalProducts.filter(item => {
+          const cate = String(item.分类 || '').toLowerCase();
+          const status = String(item.状态 || '').trim();
+          return (cate.includes('摆件') || cate.includes('玩具') || cate.includes('objects')) && status !== '已售罄';
+        });
+      } else if (pageName === 'archive') {
+        // 页面三条件：不论分类，只要状态叫“已售罄”一律塞进历史档案馆
+        filteredData = globalProducts.filter(item => String(item.状态 || '').trim() === '已售罄');
+      }
+
+      // 4. 调用画册渲染引擎
+      renderGrid(filteredData, pageName === 'archive');
+    }
+
+    // 画册渲染引擎 (完美的 3:4 无边界画册排版，名字在左，价格在右)
+    function renderGrid(items, isArchiveView) {
+      const container = document.getElementById("product-container");
+      container.innerHTML = ""; 
+
+      if(items.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-24 text-[11px] tracking-widest text-gray-400 font-light">NO PIECES AVAILABLE / 暂无该类选物</div>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const soldOut = isArchiveView || String(item.状态 || '').trim() === "已售罄";
+        const card = document.createElement("div");
+        card.className = "group flex flex-col justify-between overflow-hidden bg-transparent rounded-none shadow-none";
+        
+        const firstImg = item.图片 ? item.图片.split(',')[0].trim() : "";
+
+        card.innerHTML = `
+          <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-4 rounded-none">
+            <img src="${firstImg}" alt="${item.标题}" 
+                 class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.03] ${soldOut ? 'opacity-55' : ''}" 
+                 onerror="this.src='https://placehold.co/600x800/F5F5F3/888888?text=IMAGE+LOADING'"/>
+          </div>
+          <div class="flex justify-between items-start text-xs tracking-wide px-1">
+            <h2 class="font-light text-[#111111] max-w-[70%] text-left leading-relaxed">${item.标题}</h2>
+            <div class="text-right font-light pl-2 shrink-0">
+              ${soldOut ? `<span class="text-red-800 italic font-normal text-[11px]">(Sold)</span>` : `<span>${item.价格 || ''}</span>`}
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => openModal(item));
+        container.appendChild(card);
+      });
+    }
+
+    // 弹窗渲染逻辑
     const modal = document.getElementById('modal');
     const modalContent = document.getElementById('modalContent');
     const closeModalBtn = document.getElementById('closeModal');
@@ -113,7 +206,7 @@
     function openModal(item) {
       if (!item.图片) return;
       const imgs = item.图片.split(',').map(u => u.trim());
-      const soldOut = item.状态 && item.状态.trim() === "已售罄";
+      const soldOut = String(item.状态 || '').trim() === "已售罄";
 
       modalContent.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
@@ -127,4 +220,30 @@
           
           <div class="flex flex-col justify-between h-full py-2">
             <div>
-              <h2 class="text-lg font-light tracking-widest text-[#111111] mb-2 leading-relaxed">${item.
+              <h2 class="text-lg font-light tracking-widest text-[#111111] mb-2 leading-relaxed">${item.标题}</h2>
+              <div class="text-sm font-light tracking-widest mb-8 pb-4 border-b border-gray-100">
+                ${soldOut ? `<span class="text-red-800 italic">(Sold Out / 已售罄)</span>` : `<span class="text-gray-800">${item.价格 || ''}</span>`}
+              </div>
+              <div class="text-xs tracking-wider text-gray-500 leading-relaxed font-light whitespace-pre-line px-1">
+                ${item.详情 || 'No individual details available / 暂无详细描述'}
+              </div>
+            </div>
+            
+            <div class="mt-12">
+              <div onclick="${soldOut ? '' : 'switchPage(\'about\'); closeMenu();'}" class="w-full text-center border border-[#111111] py-3 text-xs tracking-widest uppercase font-light inquire-btn ${soldOut ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-[#111111] text-white hover:bg-white hover:text-[#111111] cursor-pointer'}">
+                ${soldOut ? 'PIECE SOLD OUT' : 'GET CONTACT ON ABOUT PAGE / 查看店主微信'}
+              </div>
+              <p class="text-[10px] text-gray-400 tracking-wider text-center mt-3 italic">Unique vintage piece. Please quote item title when inquiring.</p>
+            </div>
+          </div>
+        </div>
+      `;
+      modal.classList.add('active');
+    }
+
+    const closeMenu = () => modal.classList.remove('active');
+    closeModalBtn.addEventListener('click', closeMenu);
+    modalBg.addEventListener('click', closeMenu);
+  </script>
+</body>
+</html>
