@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>中古银饰</title>
+  <script src="[cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+  <script src="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js)"></script>
+  <style>
+    body { background-color: #f9f9f9; }
+    .sold-out::after {
+      content: "SOLD OUT";
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 0.5rem 1rem;
+      font-size: 1.25rem;
+      letter-spacing: 2px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+    .modal.active { display: flex; }
+  </style>
+</head>
+<body class="text-gray-800">
+
+  <!-- 头部 -->
+  <header class="text-center py-8">
+    <h1 class="text-3xl font-light tracking-wide">中古银饰</h1>
+    <p class="text-sm text-gray-500 mt-2">中古 • 质感 • 审美</p>
+  </header>
+
+  <!-- 主容器 -->
+  <main id="product-container" class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-4 pb-12"></main>
+
+  <!-- 弹窗 -->
+  <div id="modal" class="modal">
+    <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full relative p-6">
+      <button id="closeModal" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // https://docs.google.com/spreadsheets/d/e/2PACX-1vRdeGdOivY5ATsUWSBizx2Xu5fYHnMmtFnl3_SXA0hyH1nbMzOIdrTcCEeHyoP--74hlvWBNnD36JKf/pub?gid=9534908&single=true&output=csv
+    const csvUrl = "[docs.google.com](https://docs.google.com/spreadsheets/d/e/你的链接/pub?output=csv)";
+
+    // 解析 CSV 并渲染
+    Papa.parse(csvUrl, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const data = results.data.filter(row => row.标题 && row.图片);
+        const container = document.getElementById("product-container");
+
+        data.forEach(item => {
+          const soldOut = item.状态 && item.状态.trim() === "已售罄";
+          const card = document.createElement("div");
+          card.className = "relative bg-white rounded-lg shadow hover:shadow-lg overflow-hidden transition cursor-pointer";
+          card.innerHTML = `
+            <div class="relative ${soldOut ? 'opacity-70 grayscale pointer-events-none' : ''}">
+              <img src="${item.图片.split(',')[0].trim()}" alt="${item.标题}" class="w-full h-64 object-cover" />
+              ${soldOut ? '<div class="sold-out"></div>' : ''}
+            </div>
+            <div class="p-4 text-center">
+              <h2 class="text-lg font-medium mb-1">${item.标题}</h2>
+              <p class="text-gray-500">${item.价格 || ''}</p>
+            </div>
+          `;
+
+          // 绑定点击事件
+          card.addEventListener('click', () => openModal(item));
+          container.appendChild(card);
+        });
+      }
+    });
+
+    // 弹窗逻辑
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modalContent');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    function openModal(item) {
+      const imgs = item.图片.split(',').map(u => u.trim());
+      modalContent.innerHTML = `
+        <h2 class="text-2xl font-light mb-4 text-center">${item.标题}</h2>
+        <div class="flex overflow-x-auto gap-4 mb-4">
+          ${imgs.map(url => `<img src="${url}" class="h-64 rounded-lg object-cover flex-shrink-0" />`).join('')}
+        </div>
+        <p class="text-center text-lg text-gray-700 mb-2">${item.价格 || ''}</p>
+        <p class="text-center text-gray-500">${item.状态 || ''}</p>
+        <p class="mt-4 text-sm text-gray-600">${item.详情 || ''}</p>
+      `;
+      modal.classList.add('active');
+    }
+
+    closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+  </script>
+</body>
+</html>
