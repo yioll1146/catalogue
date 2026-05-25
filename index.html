@@ -7,18 +7,23 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
-    /* 复刻 Studio Mantel 的核心衬线字体与优雅背景 */
+    /* 严格复刻 Studio Mantel 的核心衬线字体与微暖背景色 */
     body { 
-      background-color: #FBFBFA; /* 带着极淡淡暖调的白，比纯白更有复古纸张质感 */
+      background-color: #FDFDFD; 
       font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", "Noto Serif SC", serif;
       -webkit-font-smoothing: antialiased;
     }
     
-    /* 隐藏滚动条但保留滚动功能（用于详情页多图） */
+    /* 隐藏详情页平铺图片的滚动条 */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* 优雅的弹窗渐入动画 */
+    /* 优雅的黑框按钮淡入效果 */
+    .inquire-btn {
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* 弹窗渐入动画 */
     .modal {
       opacity: 0;
       pointer-events: none;
@@ -30,52 +35,48 @@
     }
   </style>
 </head>
-<body class="text-[#222222] antialiased">
+<body class="text-[#111111] antialiased">
 
-  <header class="border-b border-[#EAEAE8] py-10 px-6 tracking-widest text-center">
+  <header class="py-16 px-6 text-center">
     <div class="max-w-6xl mx-auto">
-      <a href="#" class="text-2xl font-light uppercase tracking-[0.3em] inline-block mb-3 hover:opacity-70 transition">
+      <a href="#" class="text-2xl font-light uppercase tracking-[0.4em] inline-block mb-2 text-[#111111] hover:opacity-60 transition">
         petit moments
       </a>
-      <div class="h-[1px] w-12 bg-[#222222] mx-auto my-4"></div>
-      <p class="text-xs uppercase text-gray-400 tracking-[0.2em]">生活中的随机走神</p>
+      <p class="text-[10px] uppercase text-gray-400 tracking-[0.25em] mt-2">生活中的随机走神</p>
       
-      <nav class="mt-8 flex justify-center gap-8 text-xs uppercase text-gray-500 tracking-wider">
-        <span class="text-[#222222] border-b border-[#222222] pb-1">Jewellery / </span>
+      <nav class="mt-12 flex justify-center text-xs uppercase tracking-[0.2em] text-[#111111] font-light">
+        <span class="border-b border-[#111111] pb-1 cursor-pointer">Jewellery</span>
       </nav>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-6 pt-16 pb-32">
-    <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-20">
+  <main class="max-w-6xl mx-auto px-6 pt-8 pb-32">
+    <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-12 gap-y-20">
       </div>
   </main>
 
-  <footer class="border-t border-[#EAEAE8] py-12 text-center text-xs text-gray-400 tracking-widest uppercase">
-    &copy; petit moments. All unique pieces.
+  <footer class="py-16 text-center text-[10px] text-gray-400 tracking-[0.2em] uppercase border-t border-gray-100">
+    &copy; petit moments. curated objects.
   </footer>
 
-  <div id="modal" class="modal fixed inset-0 bg-black/40 backdrop-blur-[2px] flex justify-center align-middle items-center z-50 p-4">
+  <div id="modal" class="modal fixed inset-0 bg-black/30 backdrop-blur-[1px] flex justify-center items-center z-50 p-4">
     <div class="absolute inset-0" id="modalBg"></div>
     
-    <div class="bg-[#FBFBFA] rounded-none shadow-2xl max-w-3xl w-full relative p-8 md:p-12 z-10 max-h-[90vh] overflow-y-auto no-scrollbar">
-      <button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-[#222222] text-xl font-light transition tracking-widest">&times; CLOSE</button>
+    <div class="bg-[#FDFDFD] rounded-none shadow-xl max-w-4xl w-full relative p-6 md:p-10 z-10 max-h-[85vh] overflow-y-auto no-scrollbar">
+      <button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-[#111111] text-xs font-light tracking-widest transition">&times; CLOSE</button>
       <div id="modalContent" class="mt-4"></div>
     </div>
   </div>
 
   <script>
-    // ⚠️【请确保这一行换成你真实的 Google Sheets 公开 CSV 链接】
+    // 请确保这一行是你的 Google Sheets 公开 CSV 链接
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdeGdOivY5ATsUWSBizx2Xu5fYHnMmtFnl3_SXA0hyH1nbMzOIdrTcCEeHyoP--74hlvWBNnD36JKf/pub?gid=9534908&single=true&output=csv";
 
-    // 解析 CSV 并在页面渲染
     Papa.parse(csvUrl, {
       download: true,
       header: true,
       skipEmptyLines: true,
-      error: function(err) {
-        console.error("数据加载失败:", err);
-      },
+      error: function(err) { console.error("数据加载失败:", err); },
       complete: function(results) {
         const data = results.data.filter(row => row && row.标题 && row.图片);
         const container = document.getElementById("product-container");
@@ -84,21 +85,24 @@
         data.forEach(item => {
           const soldOut = item.状态 && item.状态.trim() === "已售罄";
           const card = document.createElement("div");
-          // 去除所有圆角和投影，改为完全平面的高级画册感
-          card.className = "group relative cursor-pointer flex flex-col justify-between overflow-hidden";
+          
+          // group 用于触发鼠标悬停时内部图片的平滑放大动作
+          card.className = "group flex flex-col justify-between overflow-hidden bg-transparent rounded-none shadow-none";
           
           const firstImg = item.图片 ? item.图片.split(',')[0].trim() : "";
 
+          // 这里是精髓：完美的 3:4 竖图布局，图片无圆角。
+          // 下方文字采用 flex-row justify-between，让标题在左，价格在右，完美还原 Studio Mantel。
           card.innerHTML = `
-            <div class="w-full aspect-[4/5] bg-[#F2F2F0] overflow-hidden relative mb-4">
+            <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-4 rounded-none">
               <img src="${firstImg}" alt="${item.标题}" 
-                   class="w-full h-full object-cover transition-transform duration-[1.2s] cubic-bezier(0.25, 0.46, 0.45, 0.94) group-hover:scale-105 ${soldOut ? 'opacity-60' : ''}" 
-                   onerror="this.src='https://placehold.co/600x750/F2F2F0/888888?text=IMAGE+LOADING'"/>
+                   class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.03] ${soldOut ? 'opacity-50' : ''}" 
+                   onerror="this.src='https://placehold.co/600x800/F5F5F3/888888?text=IMAGE+LOADING'"/>
             </div>
-            <div class="flex flex-col items-center text-center">
-              <h2 class="text-sm font-light tracking-wide text-[#222222] mb-1 group-hover:text-gray-500 transition-colors duration-300 px-2 line-clamp-2">${item.标题}</h2>
-              <div class="text-xs tracking-widest text-gray-500 font-light">
-                ${soldOut ? `<span class="text-gray-300 line-through mr-1">${item.价格 || ''}</span> <span class="text-red-800 italic font-normal">(Sold)</span>` : `<span>${item.价格 || ''}</span>`}
+            <div class="flex justify-between items-start text-xs tracking-wide px-1">
+              <h2 class="font-light text-[#111111] max-w-[70%] text-left leading-relaxed">${item.标题}</h2>
+              <div class="text-right font-light pl-2 shrink-0">
+                ${soldOut ? `<span class="text-red-800 italic font-normal text-[11px]">(Sold)</span>` : `<span>${item.价格 || ''}</span>`}
               </div>
             </div>
           `;
@@ -120,34 +124,17 @@
       const imgs = item.图片.split(',').map(u => u.trim());
       const soldOut = item.状态 && item.状态.trim() === "已售罄";
 
+      // 弹窗内部同样复刻 Studio Mantel 的左右平铺大图排版
       modalContent.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          <div class="flex flex-col gap-4 max-h-[60vh] overflow-y-auto no-scrollbar pr-1">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+          <div class="flex flex-col gap-6 max-h-[70vh] overflow-y-auto no-scrollbar pr-1">
             ${imgs.map(url => `
-              <div class="bg-[#F2F2F0] aspect-[4/5] w-full">
-                <img src="${url}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x750/F2F2F0/888888?text=IMAGE+ERROR'"/>
+              <div class="bg-[#F5F5F3] aspect-[3/4] w-full">
+                <img src="${url}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x800/F5F5F3/888888?text=IMAGE+ERROR'"/>
               </div>
             `).join('')}
           </div>
           
           <div class="flex flex-col justify-between h-full py-2">
             <div>
-              <h2 class="text-xl font-light tracking-widest text-[#222222] mb-4 leading-relaxed">${item.标题}</h2>
-              <div class="text-md font-light tracking-widest mb-6 pb-4 border-b border-[#EAEAE8]">
-                ${soldOut ? `<span class="text-gray-300 line-through">${item.价格 || ''}</span> <span class="text-red-800 ml-2 italic text-sm">(Sold Out / 已售罄)</span>` : `<span class="text-gray-800">${item.价格 || ''}</span>`}
-              </div>
-              <div class="text-xs tracking-wider text-gray-500 leading-relaxed font-light whitespace-pre-line bg-[#F5F5F3] p-4">
-                ${item.详情 || 'No further description available / 暂无详细描述'}
-              </div>
-            </div>
-
-            <div class="mt-8">
-              <div class="w-full text-center border border-[#222222] py-3 text-xs tracking-widest uppercase font-light bg-[#222222] text-white">
-                ${soldOut ? 'PIECE SOLD OUT / 已售罄' : 'INQUIRE VIA WECHAT / 微信咨询购买'}
-              </div>
-              <p class="text-[11px] text-gray-400 tracking-wider text-center mt-2 italic">中古商品独一无二，请截图联系微信确认细节</p>
-            </div>
-          </div>
-        </div>
-      `;
-      modal.classList.add('
+              <h2 class="text-lg font-light tracking-widest text-[#111111] mb-2 leading-relaxed">${item.
