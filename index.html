@@ -131,25 +131,27 @@
         aboutPage.classList.remove('active');
       }
 
-      // 3. 严格的多条件分流过滤引擎
+      // 3. 严格的多条件分流过滤引擎（已为你升级支持精细分类）
       let filteredData = [];
       
       if (pageName === 'jewellery') {
-        // 页面一条件：分类含 珠宝/银饰/jewellery 且 状态不是已售罄
+        // 只要分类里包含“珠宝、银饰、项链、手链、手镯、戒指、耳环、耳钉、胸针”中的任何一个，就自动归入 Jewellery
         filteredData = globalProducts.filter(item => {
-          const cate = String(item.分类 || '').toLowerCase();
+          const cate = String(item.分类 || '').trim();
           const status = String(item.状态 || '').trim();
-          return (cate.includes('珠宝') || cate.includes('银饰') || cate.includes('jewellery')) && status !== '已售罄';
+          const isJewellery = /珠宝|银饰|jewellery|项链|手链|手镯|戒指|耳环|耳钉|胸针/i.test(cate);
+          return isJewellery && status !== '已售罄';
         });
       } else if (pageName === 'objects') {
-        // 页面二条件：分类含 摆件/玩具/objects 且 状态不是已售罄
+        // 只要分类里包含“摆件、玩具、玩偶、石膏、木雕、objects”中的任何一个，就自动归入 Objects
         filteredData = globalProducts.filter(item => {
-          const cate = String(item.分类 || '').toLowerCase();
+          const cate = String(item.分类 || '').trim();
           const status = String(item.状态 || '').trim();
-          return (cate.includes('摆件') || cate.includes('玩具') || cate.includes('objects')) && status !== '已售罄';
+          const isObjects = /摆件|玩具|玩偶|objects|日常|杂货/i.test(cate);
+          return isObjects && status !== '已售罄';
         });
       } else if (pageName === 'archive') {
-        // 页面三条件：不论分类，只要状态叫“已售罄”一律塞进历史档案馆
+        // 无论以前是什么精细分类，只要状态是“已售罄”，通通进入历史档案馆
         filteredData = globalProducts.filter(item => String(item.状态 || '').trim() === '已售罄');
       }
 
