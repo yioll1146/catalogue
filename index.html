@@ -33,7 +33,7 @@
     .page-content { display: none; }
     .page-content.active { display: block; }
     
-    /* 💡 升级：分类导航栏激活状态，线条加粗，颜色加深 */
+    /* 分类导航栏激活状态，线条加粗，颜色加深 */
     .nav-link.active { border-bottom: 2px solid #000000; color: #000000; font-weight: 700; }
   </style>
 </head>
@@ -41,9 +41,11 @@
 
   <header class="py-16 px-6 text-center">
     <div class="max-w-6xl mx-auto">
-      <a href="#" onclick="switchPage('jewellery')" class="text-3xl font-bold uppercase tracking-[0.4em] inline-block mb-3 text-[#000000] hover:opacity-60 transition">
-        petit moments
+      
+      <a href="#" onclick="switchPage('jewellery')" class="inline-block mb-3 hover:opacity-60 transition">
+  <img src="https://a1.ax1x.com/2026/05/27/YvMk.png" alt="petit moments" class="h-12 w-auto object-contain mx-auto">
       </a>
+      
       <p class="text-xs uppercase text-gray-500 tracking-[0.25em] mt-2 font-medium">生活中的随机走神</p>
       
       <nav class="mt-14 flex justify-center gap-6 md:gap-10 text-sm uppercase tracking-[0.2em] text-[#111111]/40 font-bold">
@@ -72,13 +74,9 @@
       <div class="w-full h-[1px] bg-gray-200 my-8"></div>
       
       <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-6 text-[#000000]">CONTACT & INQUIRE</h3>
-      <p class="text-xs font-semibold tracking-widest text-gray-500 mb-6 uppercase">扫码或添加微信号与我们联络</p>
+      <p class="text-xs font-semibold tracking-widest text-gray-500 mb-8 uppercase">添加微信号与我们联络</p>
       
-      <div class="w-44 h-44 bg-[#F5F5F3] p-2 mb-6 border border-gray-200 shadow-sm">
-        <img src="https://placehold.co/400x400/F5F5F3/111111?text=WECHAT+QR" alt="微信二维码" class="w-full h-full object-cover">
-      </div>
-      
-      <p class="text-base tracking-widest text-[#000000] font-bold font-mono select-all">WeChat ID: <span class="underline font-sans">你的微信号</span></p>
+      <p class="text-base tracking-widest text-[#000000] font-bold select-all">WeChat ID: <span class="underline">你的微信号</span></p>
       <p class="text-xs font-medium text-gray-500 tracking-wider mt-3 italic">添加时请备注 “网站选物”</p>
     </div>
   </main>
@@ -96,12 +94,10 @@
   </div>
 
   <script>
-    // ⚠️【核心】在此检查并保留你的 Google Sheets CSV 链接，确保引号后面没有换行
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdeGdOivY5ATsUWSBizx2Xu5fYHnMmtFnl3_SXA0hyH1nbMzOIdrTcCEeHyoP--74hlvWBNnD36JKf/pub?gid=9534908&single=true&output=csv";
 
     let globalProducts = []; 
 
-    // 初始化：拉取并解析 CSV
     Papa.parse(csvUrl, {
       download: true,
       header: true,
@@ -113,7 +109,6 @@
       }
     });
 
-    // 多页面路由控制器
     function switchPage(pageName) {
       document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
       const activeNav = document.getElementById(`nav-${pageName}`);
@@ -154,7 +149,6 @@
       renderGrid(filteredData, pageName === 'archive');
     }
 
-    // 画册排版引擎
     function renderGrid(items, isArchiveView) {
       const container = document.getElementById("product-container");
       container.innerHTML = ""; 
@@ -173,7 +167,6 @@
         
         const firstImg = item.图片 && item.图片.trim() !== "" ? item.图片.split(',')[0].trim() : fallbackImg;
 
-        // 💡 升级：这里的货物名字（h2）和价格全部换成了 text-sm（变大）、font-bold（黑体粗体）、text-black（纯黑）
         card.innerHTML = `
           <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-4 rounded-none">
             <img src="${firstImg}" alt="${item.标题}" 
@@ -193,7 +186,6 @@
       });
     }
 
-    // 弹窗渲染逻辑
     const modal = document.getElementById('modal');
     const modalContent = document.getElementById('modalContent');
     const closeModalBtn = document.getElementById('closeModal');
@@ -204,7 +196,6 @@
       const imgs = item.图片 && item.图片.trim() !== "" ? item.图片.split(',').map(u => u.trim()) : [fallbackImg];
       const soldOut = String(item.状态 || '').trim() === "已售罄";
 
-      // 💡 升级：弹窗内的标题、价格和排版细节同样进行了视觉加粗与字号放大
       modalContent.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
           <div class="flex flex-col gap-6 max-h-[70vh] overflow-y-auto no-scrollbar pr-1">
