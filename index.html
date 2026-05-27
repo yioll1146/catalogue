@@ -6,14 +6,25 @@
   <title>petit moments ｜ 生活中的随机走神</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  
+  <!-- 💡 核心引入、 (Playfair Display 经典衬线 & Montserrat 几何无衬线) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+
   <style>
-    /* 严格复刻衬线字体，微暖背景色 */
+    /* 严格复刻微暖画册背景，全局默认采用高级字族组合 */
     body { 
       background-color: #FDFDFD; 
-      font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", "Noto Serif SC", serif;
+      font-family: "Playfair Display", "Noto Serif SC", serif;
       -webkit-font-smoothing: antialiased;
     }
     
+    /* 💡 分类导航、价格等核心功能区域，强制采用扁平极简的 Montserrat 几何无衬线体 */
+    .mantel-sans {
+      font-family: "Montserrat", "PingFang SC", "Helvetica Neue", sans-serif;
+    }
+
     /* 隐藏详情页平铺图片的滚动条 */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -33,22 +44,25 @@
     .page-content { display: none; }
     .page-content.active { display: block; }
     
-    /* 分类导航栏激活状态，线条加粗，颜色加深 */
+    /* 分类导航栏激活状态：纯黑、加粗底线条 */
     .nav-link.active { border-bottom: 2px solid #000000; color: #000000; font-weight: 700; }
   </style>
 </head>
 <body class="text-[#000000] antialiased">
 
+  <!-- 1. 顶部导航栏 -->
   <header class="py-16 px-6 text-center">
     <div class="max-w-6xl mx-auto">
       
+      <!-- 💡【你的自适应图片 LOGO 区】 -->
       <a href="#" onclick="switchPage('jewellery')" class="inline-block mb-3 hover:opacity-60 transition">
-  <img src="https://a1.ax1x.com/2026/05/27/YvMk.png" alt="petit moments" class="h-40 md:h-64 w-auto object-contain mx-auto">
+        <img src="https://a1.ax1x.com/2026/05/27/YvMk.png" alt="petit moments" class="h-40 md:h-64 w-auto object-contain mx-auto">
       </a>
       
-      <p class="text-xs uppercase text-gray-500 tracking-[0.25em] mt-2 font-medium">生活中的随机走神</p>
+      <p class="text-xs uppercase text-gray-500 tracking-[0.2em] mt-2 font-medium">生活中的随机走神</p>
       
-      <nav class="mt-14 flex justify-center gap-8 md:gap-12 text-xs uppercase tracking-[0.25em] text-[#111111]/40 font-bold">
+      <!-- 💡 分类导航：采用 Montserrat 几何无衬线体，字号缩小，间距拉开，极具大牌呼吸感 -->
+      <nav class="mantel-sans mt-14 flex justify-center gap-8 md:gap-12 text-xs uppercase tracking-[0.25em] text-[#111111]/40 font-bold">
         <button onclick="switchPage('jewellery')" id="nav-jewellery" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">Jewellery</button>
         <button onclick="switchPage('objects')" id="nav-objects" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">Objects</button>
         <button onclick="switchPage('archive')" id="nav-archive" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">Archive</button>
@@ -57,14 +71,18 @@
     </div>
   </header>
 
+  <!-- ==================== 页面一、二、三：商品网格展示页 ==================== -->
   <main id="store-page" class="page-content active max-w-6xl mx-auto px-6 pt-8 pb-32">
     <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-12 gap-y-20">
-      </div>
+      <!-- 货品卡片由 JavaScript 动态渲染 -->
+    </div>
   </main>
 
+  <!-- ==================== 页面四：About 独立介绍页 ==================== -->
   <main id="about-page" class="page-content max-w-2xl mx-auto px-6 pt-12 pb-32 text-center">
     <div class="flex flex-col items-center">
-      <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-8 text-[#000000]">关于 petit moments</h3>
+      <!-- 品牌故事 -->
+      <h3 class="text-xl font-bold tracking-[0.1em] mb-8 text-[#000000]">关于 petit moments</h3>
       <p class="text-sm font-medium tracking-widest leading-loose text-[#000000] mb-14 max-w-md">
         生活中的随机走神。<br>
         我们搜集带有时间痕迹的中古银饰、古董摆件与带有拙感的玩具。<br>
@@ -73,22 +91,27 @@
       
       <div class="w-full h-[1px] bg-gray-200 my-8"></div>
       
-      <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-6 text-[#000000]">CONTACT & INQUIRE</h3>
-      <p class="text-xs font-semibold tracking-widest text-gray-500 mb-8 uppercase">添加微信号与我们联络</p>
+      <!-- 微信联络信息区 -->
+      <h3 class="text-xl font-bold tracking-[0.1em] mb-6 text-[#000000]">CONTACT & INQUIRE</h3>
+      <p class="mantel-sans text-xs font-semibold tracking-widest text-gray-500 mb-8 uppercase">添加微信号与我们联络</p>
       
-      <p class="text-base tracking-widest text-[#000000] font-bold select-all">WeChat ID: <span class="underline">Petitmoments</span></p>
+      <!-- 💡 微信号：统一采用了高级的 Playfair Display 衬线体，粗体黑字，极具优雅格调 -->
+      <!-- ⚠️【这里修改】请把下方“你的微信号”五个汉字，替换为你真实的微信 ID -->
+      <p class="text-lg tracking-widest text-[#000000] font-bold select-all">WeChat ID: <span class="underline">Petitmoments</span></p>
       <p class="text-xs font-medium text-gray-500 tracking-wider mt-3 italic">添加时请备注 “网站选物”</p>
     </div>
   </main>
 
-  <footer class="py-16 text-center text-[10px] text-gray-500 tracking-[0.2em] uppercase border-t border-gray-100">
+  <!-- 页脚 -->
+  <footer class="mantel-sans py-16 text-center text-[10px] text-gray-500 tracking-[0.2em] uppercase border-t border-gray-100">
     &copy; petit moments. curated objects.
   </footer>
 
+  <!-- Studio Mantel 风格弹窗 -->
   <div id="modal" class="modal fixed inset-0 bg-black/30 backdrop-blur-[1px] flex justify-center items-center z-50 p-4">
     <div class="absolute inset-0" id="modalBg"></div>
     <div class="bg-[#FDFDFD] rounded-none shadow-xl max-w-4xl w-full relative p-6 md:p-10 z-10 max-h-[85vh] overflow-y-auto no-scrollbar">
-      <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-[#000000] text-xs font-bold tracking-widest transition">&times; CLOSE</button>
+      <button id="closeModal" class="mantel-sans absolute top-4 right-4 text-gray-500 hover:text-[#000000] text-xs font-bold tracking-widest transition">&times; CLOSE</button>
       <div id="modalContent" class="mt-4"></div>
     </div>
   </div>
@@ -131,19 +154,19 @@
       if (pageName === 'jewellery') {
         filteredData = globalProducts.filter(item => {
           const cate = String(item.分类 || '').trim();
-          const status = String(item.状态 || '').trim();
+          const status = String(item.states || item.状态 || '').trim();
           const isJewellery = /珠宝|银饰|jewellery|项链|手链|手镯|戒指|耳环|耳钉|胸针/i.test(cate);
           return isJewellery && status !== '已售罄';
         });
       } else if (pageName === 'objects') {
         filteredData = globalProducts.filter(item => {
           const cate = String(item.分类 || '').trim();
-          const status = String(item.状态 || '').trim();
+          const status = String(item.states || item.状态 || '').trim();
           const isObjects = /摆件|玩具|玩偶|石膏|木雕|objects|日常|杂货/i.test(cate);
           return isObjects && status !== '已售罄';
         });
       } else if (pageName === 'archive') {
-        filteredData = globalProducts.filter(item => String(item.状态 || '').trim() === '已售罄');
+        filteredData = globalProducts.filter(item => String(item.states || item.状态 || '').trim() === '已售罄');
       }
 
       renderGrid(filteredData, pageName === 'archive');
@@ -154,7 +177,7 @@
       container.innerHTML = ""; 
 
       if(items.length === 0) {
-        container.innerHTML = `<div class="col-span-full text-center py-24 text-xs tracking-widest text-gray-500 font-bold">NO PIECES AVAILABLE / 暂无该类选物</div>`;
+        container.innerHTML = `<div class="mantel-sans col-span-full text-center py-24 text-xs tracking-widest text-gray-500 font-bold">NO PIECES AVAILABLE / 暂无该类选物</div>`;
         return;
       }
 
@@ -163,19 +186,20 @@
       items.forEach(item => {
         const soldOut = isArchiveView || String(item.states || item.状态 || '').trim() === "已售罄";
         const card = document.createElement("div");
-        card.className = "group flex flex-col justify-between overflow-hidden bg-transparent rounded-none shadow-none";
+        card.className = "group flex flex-col justify-between overflow-hidden bg-transparent rounded-none shadow-none cursor-pointer";
         
         const firstImg = item.图片 && item.图片.trim() !== "" ? item.图片.split(',')[0].trim() : fallbackImg;
 
+        // 💡 升级：商品名称采用饱满有力的黑粗衬线体，价格采用干净扁平的 Montserrat 几何无衬线体，配合极有质感
         card.innerHTML = `
           <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-4 rounded-none">
             <img src="${firstImg}" alt="${item.标题}" 
                  class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.03]" 
                  onerror="this.src='${fallbackImg}'"/>
           </div>
-          <div class="flex justify-between items-start text-sm tracking-wide px-1">
-            <h2 class="font-bold text-[#000000] max-w-[70%] text-left leading-relaxed">${item.标题}</h2>
-            <div class="text-right font-bold text-[#000000] pl-2 shrink-0">
+          <div class="flex justify-between items-start tracking-wide px-1">
+            <h2 class="text-base font-bold text-[#000000] max-w-[70%] text-left leading-relaxed">${item.标题}</h2>
+            <div class="mantel-sans text-right text-xs font-bold text-[#000000] pl-2 shrink-0 pt-0.5">
               ${soldOut ? `<span class="text-red-800 italic font-bold">(Sold)</span>` : `<span>${item.价格 || ''}</span>`}
             </div>
           </div>
@@ -194,8 +218,9 @@
     function openModal(item) {
       const fallbackImg = "https://placehold.co/600x800/F5F5F3/A3A3A3?text=IMAGE+COMING+SOON";
       const imgs = item.图片 && item.图片.trim() !== "" ? item.图片.split(',').map(u => u.trim()) : [fallbackImg];
-      const soldOut = String(item.状态 || '').trim() === "已售罄";
+      const soldOut = String(item.states || item.状态 || '').trim() === "已售罄";
 
+      // 💡 弹窗细节：商品大名、价格和购买按钮，均使用了 Mantel 字体排版系统进行升级
       modalContent.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
           <div class="flex flex-col gap-6 max-h-[70vh] overflow-y-auto no-scrollbar pr-1">
@@ -208,8 +233,8 @@
           
           <div class="flex flex-col justify-between h-full py-2">
             <div>
-              <h2 class="text-xl font-bold tracking-widest text-[#000000] mb-3 leading-relaxed">${item.标题}</h2>
-              <div class="text-base font-bold tracking-widest mb-8 pb-4 border-b border-gray-200 text-[#000000]">
+              <h2 class="text-2xl font-bold tracking-wide text-[#000000] mb-3 leading-relaxed">${item.标题}</h2>
+              <div class="mantel-sans text-sm font-bold tracking-widest mb-8 pb-4 border-b border-gray-200 text-[#000000]">
                 ${soldOut ? `<span class="text-red-800 italic">(Sold Out / 已售罄)</span>` : `<span>${item.价格 || ''}</span>`}
               </div>
               <div class="text-sm tracking-wider text-black leading-loose font-medium whitespace-pre-line px-1">
@@ -218,10 +243,10 @@
             </div>
             
             <div class="mt-12">
-              <div onclick="${soldOut ? '' : 'switchPage(\'about\'); closeMenu();'}" class="w-full text-center border-2 border-[#000000] py-3.5 text-xs tracking-widest uppercase font-bold inquire-btn ${soldOut ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-[#000000] text-white hover:bg-white hover:text-[#000000] cursor-pointer'}">
+              <div onclick="${soldOut ? '' : 'switchPage(\'about\'); closeMenu();'}" class="mantel-sans w-full text-center border-2 border-[#000000] py-3.5 text-xs tracking-widest uppercase font-bold inquire-btn ${soldOut ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-[#000000] text-white hover:bg-white hover:text-[#000000] cursor-pointer'}">
                 ${soldOut ? 'PIECE SOLD OUT' : 'GET CONTACT ON ABOUT PAGE / 查看店主微信'}
               </div>
-              <p class="text-[10px] text-gray-500 tracking-wider text-center mt-3 font-semibold italic">Unique vintage piece. Please quote item title when inquiring.</p>
+              <p class="mantel-sans text-[10px] text-gray-500 tracking-wider text-center mt-3 font-semibold italic">Unique vintage piece. Please quote item title when inquiring.</p>
             </div>
           </div>
         </div>
