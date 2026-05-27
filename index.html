@@ -7,20 +7,20 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   
-  <!-- 💡 核心引入 (Playfair Display 经典衬线 & Montserrat 几何无衬线) -->
+  <!-- 💡 Mantel 官方同款字体源 (Playfair Display 经典衬线 & Montserrat 几何无衬线) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <style>
-    /* 严格复刻微暖画册背景，全局默认采用高级字族组合 */
+    /* 全局默认采用 Mantel 的高级字族组合 */
     body { 
       background-color: #FDFDFD; 
       font-family: "Playfair Display", "Noto Serif SC", serif;
       -webkit-font-smoothing: antialiased;
     }
     
-    /* 💡 分类导航、价格等核心功能区域，强制采用扁平极简的 Montserrat 几何无衬线体 */
+    /* 分类导航、价格等核心功能区域，采用扁平极简的 Montserrat 几何无衬线体 */
     .mantel-sans {
       font-family: "Montserrat", "PingFang SC", "Helvetica Neue", sans-serif;
     }
@@ -59,9 +59,9 @@
         <img src="https://a1.ax1x.com/2026/05/27/YvMk.png" alt="petit moments" class="h-40 md:h-64 w-auto object-contain mx-auto">
       </a>
       
-      <p class="text-xs uppercase text-gray-500 tracking-[0.2em] mt-8 font-medium">生活中的随机走神</p>
+      <p class="text-xs uppercase text-gray-500 tracking-[0.25em] mt-2 font-medium">生活中的随机走神</p>
       
-      <!-- 💡 分类导航：采用 Montserrat 几何无衬线体，字号缩小，间距拉开，极具大牌呼吸感 -->
+      <!-- 分类导航：采用 Montserrat 几何无衬线体 -->
       <nav class="mantel-sans mt-14 flex justify-center gap-8 md:gap-12 text-xs uppercase tracking-[0.25em] text-[#111111]/40 font-bold">
         <button onclick="switchPage('jewellery')" id="nav-jewellery" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">Jewellery</button>
         <button onclick="switchPage('objects')" id="nav-objects" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">Objects</button>
@@ -95,7 +95,6 @@
       <h3 class="text-xl font-bold tracking-[0.1em] mb-6 text-[#000000]">CONTACT & INQUIRE</h3>
       <p class="mantel-sans text-xs font-semibold tracking-widest text-gray-500 mb-8 uppercase">添加微信号与我们联络</p>
       
-      <!-- 💡 微信号：统一采用了高级的 Playfair Display 衬线体，粗体黑字，极具优雅格调 -->
       <!-- ⚠️【这里修改】请把下方“你的微信号”五个汉字，替换为你真实的微信 ID -->
       <p class="text-lg tracking-widest text-[#000000] font-bold select-all">WeChat ID: <span class="underline">Petitmoments</span></p>
       <p class="text-xs font-medium text-gray-500 tracking-wider mt-3 italic">添加时请备注 “网站选物”</p>
@@ -132,6 +131,7 @@
       }
     });
 
+    // 💡 已修复：重新纠正数据过滤匹配逻辑
     function switchPage(pageName) {
       document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
       const activeNav = document.getElementById(`nav-${pageName}`);
@@ -154,19 +154,19 @@
       if (pageName === 'jewellery') {
         filteredData = globalProducts.filter(item => {
           const cate = String(item.分类 || '').trim();
-          const status = String(item.states || item.状态 || '').trim();
+          const status = String(item.状态 || '').trim();
           const isJewellery = /珠宝|银饰|jewellery|项链|手链|手镯|戒指|耳环|耳钉|胸针/i.test(cate);
           return isJewellery && status !== '已售罄';
         });
       } else if (pageName === 'objects') {
         filteredData = globalProducts.filter(item => {
           const cate = String(item.分类 || '').trim();
-          const status = String(item.states || item.状态 || '').trim();
+          const status = String(item.状态 || '').trim();
           const isObjects = /摆件|玩具|玩偶|石膏|木雕|objects|日常|杂货/i.test(cate);
           return isObjects && status !== '已售罄';
         });
       } else if (pageName === 'archive') {
-        filteredData = globalProducts.filter(item => String(item.states || item.状态 || '').trim() === '已售罄');
+        filteredData = globalProducts.filter(item => String(item.状态 || '').trim() === '已售罄');
       }
 
       renderGrid(filteredData, pageName === 'archive');
@@ -184,13 +184,12 @@
       const fallbackImg = "https://placehold.co/600x800/F5F5F3/A3A3A3?text=IMAGE+COMING+SOON";
 
       items.forEach(item => {
-        const soldOut = isArchiveView || String(item.states || item.状态 || '').trim() === "已售罄";
+        const soldOut = isArchiveView || String(item.状态 || '').trim() === "已售罄";
         const card = document.createElement("div");
         card.className = "group flex flex-col justify-between overflow-hidden bg-transparent rounded-none shadow-none cursor-pointer";
         
         const firstImg = item.图片 && item.图片.trim() !== "" ? item.图片.split(',')[0].trim() : fallbackImg;
 
-        // 💡 升级：商品名称采用饱满有力的黑粗衬线体，价格采用干净扁平的 Montserrat 几何无衬线体，配合极有质感
         card.innerHTML = `
           <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-4 rounded-none">
             <img src="${firstImg}" alt="${item.标题}" 
@@ -218,9 +217,8 @@
     function openModal(item) {
       const fallbackImg = "https://placehold.co/600x800/F5F5F3/A3A3A3?text=IMAGE+COMING+SOON";
       const imgs = item.图片 && item.图片.trim() !== "" ? item.图片.split(',').map(u => u.trim()) : [fallbackImg];
-      const soldOut = String(item.states || item.状态 || '').trim() === "已售罄";
+      const soldOut = String(item.状态 || '').trim() === "已售罄";
 
-      // 💡 弹窗细节：商品大名、价格和购买按钮，均使用了 Mantel 字体排版系统进行升级
       modalContent.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
           <div class="flex flex-col gap-6 max-h-[70vh] overflow-y-auto no-scrollbar pr-1">
@@ -238,7 +236,7 @@
                 ${soldOut ? `<span class="text-red-800 italic">(Sold Out / 已售罄)</span>` : `<span>${item.价格 || ''}</span>`}
               </div>
               <div class="text-sm tracking-wider text-black leading-loose font-medium whitespace-pre-line px-1">
-                ${item.详情 || Coming Soon / 暂无详细描述'}
+                ${item.详情 || 'No individual details available / 暂无详细描述'}
               </div>
             </div>
             
