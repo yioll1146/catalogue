@@ -9,7 +9,7 @@
   <style>
     /* 严格复刻衬线字体，微暖背景色 */
     body { 
-      background-color: #FDFDFD; 
+      background-color: ##F9F6F0; 
       font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", "Noto Serif SC", serif;
       -webkit-font-smoothing: antialiased;
     }
@@ -51,7 +51,7 @@
       <p class="text-xs uppercase text-gray-500 tracking-[0.25em] mt-2 font-medium">日常生活中的随机走神</p>
       
       <!-- 💡 升级：分类导航字号调小至 text-xs，字母间距 tracking-[0.25em] 拉开，分类间距大幅拉开 gap-8 md:gap-12 -->
-      <nav class="mt-14 flex justify-center gap-8 md:gap-12 text-xs uppercase tracking-[0.25em] text-[#111111]/40 font-bold">
+      <nav class="mt-6 flex justify-center gap-8 md:gap-12 text-sm uppercase tracking-[0.25em] text-[#111111]/40 font-bold">
         <button onclick="switchPage('jewellery')" id="nav-jewellery" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">Jewellery</button>
         <button onclick="switchPage('objects')" id="nav-objects" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">Objects</button>
         <button onclick="switchPage('archive')" id="nav-archive" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">Archive</button>
@@ -78,12 +78,12 @@
         每一件器物都是时间的孤品，静静等待下一个懂得它光泽的主人。
       </p>
       
-      <div class="w-full h-[1px] bg-gray-200 my-8"></div>
+      <div class="w-full h-[1px] bg-gray-200 my-4"></div>
       
       <!-- 微信联络信息区 -->
-      <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-6 text-[#000000]">CONTACT & INQUIRE</h3>
-      <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-6 text-[#000000]">联络 & 咨询</h3>
-      <p class="text-sm font-semibold tracking-widest text-gray-500 mb-8 uppercase">添加微信号与我们联络</p>
+      <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-2 text-[#000000]">CONTACT & INQUIRE</h3>
+      <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-2 text-[#000000]">联络 & 咨询</h3>
+      <p class="text-sm font-semibold tracking-widest text-gray-500 mb-2 uppercase">添加微信号与我们联络</p>
       
       <!-- ⚠️【这里修改】请把下方“你的微信号”五个汉字，替换为你真实的微信 ID -->
       <p class="text-base tracking-widest text-[#000000] font-bold select-all"><span class="underline">Petitmoments</span></p>
@@ -99,7 +99,7 @@
   <!-- Studio Mantel 风格弹窗 -->
   <div id="modal" class="modal fixed inset-0 bg-black/30 backdrop-blur-[1px] flex justify-center items-center z-50 p-4">
     <div class="absolute inset-0" id="modalBg"></div>
-    <div class="bg-[#FDFDFD] rounded-none shadow-xl max-w-4xl w-full relative p-6 md:p-10 z-10 max-h-[85vh] overflow-y-auto no-scrollbar">
+    <div class="bg-[#F9F6F0] rounded-none shadow-xl max-w-4xl w-full relative p-6 md:p-10 z-10 max-h-[85vh] overflow-y-auto no-scrollbar">
       <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-[#000000] text-xs font-bold tracking-widest transition">&times; CLOSE</button>
       <div id="modalContent" class="mt-4"></div>
     </div>
