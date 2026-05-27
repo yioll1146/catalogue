@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   
-  <!-- 💡 核心引入、 (Playfair Display 经典衬线 & Montserrat 几何无衬线) -->
+  <!-- 💡 核心引入 (Playfair Display 经典衬线 & Montserrat 几何无衬线) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -59,7 +59,7 @@
         <img src="https://a1.ax1x.com/2026/05/27/YvMk.png" alt="petit moments" class="h-40 md:h-64 w-auto object-contain mx-auto">
       </a>
       
-      <p class="text-xs uppercase text-gray-500 tracking-[0.2em] mt-2 font-medium">生活中的随机走神</p>
+      <p class="text-xs uppercase text-gray-500 tracking-[0.2em] mt-8 font-medium">生活中的随机走神</p>
       
       <!-- 💡 分类导航：采用 Montserrat 几何无衬线体，字号缩小，间距拉开，极具大牌呼吸感 -->
       <nav class="mantel-sans mt-14 flex justify-center gap-8 md:gap-12 text-xs uppercase tracking-[0.25em] text-[#111111]/40 font-bold">
@@ -238,7 +238,7 @@
                 ${soldOut ? `<span class="text-red-800 italic">(Sold Out / 已售罄)</span>` : `<span>${item.价格 || ''}</span>`}
               </div>
               <div class="text-sm tracking-wider text-black leading-loose font-medium whitespace-pre-line px-1">
-                ${item.详情 || 'No individual details available / 暂无详细描述'}
+                ${item.详情 || Coming Soon / 暂无详细描述'}
               </div>
             </div>
             
