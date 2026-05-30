@@ -103,8 +103,9 @@
   </div>
 
   <script>
-    const csvUrl = "https://docs.qq.com//sheet/export/csv?id=/DUW9LSERzZE1Od2Nq?tab=BB08J2";
-
+    // 💡 这是为你彻底修复后的纯净化、高可用国内直连链接（已剔除多余的斜杠、问号和标签页后缀）
+    const csvUrl = "https://docs.qq.com/dop/opp/downloadObj?id=DUW9LSERzZE1Od2Nq&type=csv";
+  
     let globalProducts = []; 
 
     Papa.parse(csvUrl, {
