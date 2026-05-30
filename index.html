@@ -10,7 +10,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
-    /* 严格复刻衬线字体，微暖米黄色背景色 */
+    /* 完美保留：原版微暖米黄色背景与精细衬线字体 */
     body { 
       background-color: #F9F6F0; 
       font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", "Noto Serif SC", serif;
@@ -46,7 +46,7 @@
     <div class="max-w-6xl mx-auto">
       
       <a href="#" onclick="switchPage('jewellery')" class="inline-block mb-0 hover:opacity-60 transition">
-        <img src="https://a1.ax1x.com/2026/05/29/WcxJ.png" alt="petit moments" class="h-10 md:h-14 w-auto object-contain mx-auto">
+        <img src="https://a1.ax1x.com/2026/05/29/WcxJ.png" alt="petit moments" referrerpolicy="no-referrer" class="h-10 md:h-14 w-auto object-contain mx-auto">
       </a>
       
       <p class="text-xs uppercase text-gray-500 tracking-[0.25em] mt-4 font-medium">日常生活中的随机走神</p>
@@ -76,10 +76,12 @@
       
       <div class="w-full h-[1px] bg-gray-200 my-10"></div>
       
-      <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-0 text-[#000000]">CONTACT & INQUIRE</h3>
-      <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-14 text-[#000000]">联络 & 咨询</h3>
-      <p class="text-sm font-semibold tracking-widest text-gray-500 mb-2 uppercase">添加微信号与我们联络</p>
-      <p class="text-base tracking-widest text-[#000000] font-bold select-all"><span class="underline">Petitmoments</span></p>
+      <div class="mt-10">
+        <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-0 text-[#000000]">CONTACT & INQUIRE</h3>
+        <h3 class="text-base font-bold tracking-[0.2em] uppercase mb-14 text-[#000000]">联络 & 咨询</h3>
+        <p class="text-sm font-semibold tracking-widest text-gray-500 mb-2 uppercase">添加微信号与我们联络</p>
+        <p class="text-base tracking-widest text-[#000000] font-bold select-all">WeChat ID: <span class="underline">Petitmoments</span></p>
+      </div>
     </div>
   </main>
 
@@ -106,7 +108,7 @@
       skipEmptyLines: true,
       error: function(err) { console.error("数据加载失败:", err); },
       complete: function(results) {
-        globalProducts = results.data.filter(row => row && row.标题);
+        globalProducts = results.data.filter(row => row && (row.标题 || row.图片));
         switchPage('jewellery');
       }
     });
@@ -130,25 +132,38 @@
 
       let filteredData = [];
       
+      // 💡 核心修复：采用超高容错率的模糊匹配，只要你填了数据，就绝对不会被代码吞掉
       if (pageName === 'jewellery') {
         filteredData = globalProducts.filter(item => {
           const cate = String(item.分类 || '').trim();
           const status = String(item.状态 || '').trim();
-          const isJewellery = /珠宝|银饰|jewellery|项链|手链|手镯|戒指|耳环|耳钉|胸针/i.test(cate);
-          return isJewellery && status !== '已售罄';
+          const isObjects = /摆件|玩具|玩偶|石膏|木雕|objects|日常|杂货/i.test(cate);
+          return status !== '已售罄' && !isObjects; 
         });
       } else if (pageName === 'objects') {
         filteredData = globalProducts.filter(item => {
           const cate = String(item.分类 || '').trim();
           const status = String(item.状态 || '').trim();
-          const isObjects = /摆件|玩具|玩偶|石膏|木雕|objects|日常|杂货/i.test(cate);
-          return isObjects && status !== '已售罄';
+          return /摆件|玩具|玩偶|石膏|木雕|objects|日常|杂货/i.test(cate) && status !== '已售罄';
         });
       } else if (pageName === 'archive') {
         filteredData = globalProducts.filter(item => String(item.状态 || '').trim() === '已售罄');
       }
 
       renderGrid(filteredData, pageName === 'archive');
+    }
+
+    function getSafeImageUrl(rawUrl, fallback) {
+      if (!rawUrl || rawUrl.trim() === "") return fallback;
+      try {
+        let cleanedUrl = rawUrl.split(',')[0].replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+        if (cleanedUrl.startsWith('http://') || cleanedUrl.startsWith('https://')) {
+          return cleanedUrl;
+        }
+        return fallback;
+      } catch (e) {
+        return fallback;
+      }
     }
 
     function renderGrid(items, isArchiveView) {
@@ -167,22 +182,16 @@
         const card = document.createElement("div");
         card.className = "group flex flex-col justify-between overflow-hidden bg-transparent rounded-none shadow-none cursor-pointer";
         
-        let firstImg = fallbackImg;
-        if (item.图片 && item.图片.trim() !== "") {
-          const parts = item.图片.split(',');
-          if (parts.length > 0 && parts[0].trim() !== "") {
-            firstImg = parts[0].trim();
-          }
-        }
+        const firstImg = getSafeImageUrl(item.图片, fallbackImg);
 
         card.innerHTML = `
           <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-4 rounded-none">
-            <img src="${firstImg}" alt="${item.标题}" 
+            <img src="${firstImg}" alt="${item.标题 || ''}" referrerpolicy="no-referrer"
                  class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.03]" 
                  onerror="this.src='${fallbackImg}'"/>
           </div>
           <div class="flex justify-between items-start text-sm tracking-wide px-1">
-            <h2 class="font-bold text-[#000000] max-w-[70%] text-left leading-relaxed">${item.标题}</h2>
+            <h2 class="font-bold text-[#000000] max-w-[70%] text-left leading-relaxed">${item.标题 || '未命名选物'}</h2>
             <div class="text-right font-bold text-[#000000] pl-2 shrink-0">
               ${soldOut ? `<span class="text-red-800 italic font-bold">(Sold)</span>` : `<span>${item.价格 || ''}</span>`}
             </div>
@@ -204,7 +213,9 @@
       
       let imgs = [fallbackImg];
       if (item.图片 && item.图片.trim() !== "") {
-        const parsedImgs = item.图片.split(',').map(u => u.trim()).filter(u => u !== "");
+        const parsedImgs = item.图片.split(',')
+          .map(u => u.replace(/[\u200B-\u200D\uFEFF]/g, '').trim())
+          .filter(u => u !== "");
         if (parsedImgs.length > 0) imgs = parsedImgs;
       }
       
@@ -215,14 +226,14 @@
           <div class="flex flex-col gap-6 max-h-[70vh] overflow-y-auto no-scrollbar pr-1">
             ${imgs.map(url => `
               <div class="bg-[#F5F5F3] aspect-[3/4] w-full">
-                <img src="${url}" class="w-full h-full object-cover" onerror="this.src='${fallbackImg}'"/>
+                <img src="${url}" referrerpolicy="no-referrer" class="w-full h-full object-cover" onerror="this.src='${fallbackImg}'"/>
               </div>
             `).join('')}
           </div>
           
           <div class="flex flex-col justify-between h-full py-2">
             <div>
-              <h2 class="text-xl font-bold tracking-widest text-[#000000] mb-3 leading-relaxed">${item.标题}</h2>
+              <h2 class="text-xl font-bold tracking-widest text-[#000000] mb-3 leading-relaxed">${item.标题 || '未命名选物'}</h2>
               <div class="text-base font-bold tracking-widest mb-8 pb-4 border-b border-gray-200 text-[#000000]">
                 ${soldOut ? `<span class="text-red-800 italic">(Sold Out / 已售罄)</span>` : `<span>${item.价格 || ''}</span>`}
               </div>
