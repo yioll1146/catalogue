@@ -9,11 +9,13 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
+
   <style>
-    /* 完美保留：原版微暖米黄色背景与精细衬线字体 */
+    /* 原版微暖米黄色背景与精细衬线字体 */
     body { 
       background-color: #F9F6F0; 
       font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", "Noto Serif SC", serif;
@@ -45,7 +47,7 @@
 </head>
 <body class="text-[#000000] antialiased">
 
-  <header class="py-16 px-6 text-center">
+  <header class="py-12 md:py-16 px-4 md:px-6 text-center">
     <div class="max-w-6xl mx-auto">
       
       <a href="#" onclick="switchPage('jewellery')" class="inline-block mb-0 hover:opacity-60 transition">
@@ -54,7 +56,7 @@
       
       <p class="text-xs uppercase text-gray-500 tracking-[0.25em] mt-4 font-medium">日常生活中的随机走神</p>
       
-      <nav class="mt-8 flex justify-between md:justify-center max-w-sm md:max-w-none mx-auto gap-x-2 md:gap-x-12 text-xs md:text-sm uppercase tracking-[0.2em] md:tracking-[0.25em] text-[#111111]/40 font-bold px-2 md:px-0">
+      <nav class="mt-8 flex justify-between md:justify-center max-w-sm md:max-w-none mx-auto gap-x-2 md:gap-x-12 text-sm uppercase tracking-[0.25em] text-[#111111]/40 font-bold px-2 md:px-0">
         <button onclick="switchPage('jewellery')" id="nav-jewellery" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">JEWELLERY</button>
         <button onclick="switchPage('objects')" id="nav-objects" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">OBJECTS</button>
         <button onclick="switchPage('archive')" id="nav-archive" class="nav-link pb-1 text-black hover:text-[#000000] transition duration-300">ARCHIVE</button>
@@ -107,11 +109,24 @@
 
     Papa.parse(csvUrl, {
       download: true,
-      header: true,
+      header: false, 
       skipEmptyLines: true,
       error: function(err) { console.error("数据加载失败:", err); },
       complete: function(results) {
-        globalProducts = results.data.filter(row => row && (row.标题 || row.图片));
+        const rawRows = results.data.slice(1); 
+        globalProducts = rawRows.map(row => {
+          if (!row || row.length < 2) return null;
+          return {
+            标题: row[0], // A列
+            图片: row[1], // B列
+            价格: row[2], // C列
+            状态: row[3], // D列
+            详情: row[4], // E列
+            分类: row[6], // G列
+            展示控制: row[7] // H列 💡 新增：强行读取表格第 H 列的“展示”开关
+          };
+        }).filter(item => item && (item.标题 || item.图片));
+
         switchPage('jewellery');
       }
     });
@@ -135,22 +150,25 @@
 
       let filteredData = [];
       
-      // 💡 核心修复：采用超高容错率的模糊匹配，只要你填了数据，就绝对不会被代码吞掉
       if (pageName === 'jewellery') {
         filteredData = globalProducts.filter(item => {
-          const cate = String(item.分类 || '').trim();
+          const codeCate = String(item.分类 || '').trim().toLowerCase();
           const status = String(item.状态 || '').trim();
-          const isObjects = /摆件|玩具|玩偶|石膏|木雕|objects|日常|杂货/i.test(cate);
-          return status !== '已售罄' && !isObjects; 
+          return codeCate === 'jewellery' && status !== '已售罄';
         });
       } else if (pageName === 'objects') {
         filteredData = globalProducts.filter(item => {
-          const cate = String(item.分类 || '').trim();
+          const codeCate = String(item.分类 || '').trim().toLowerCase();
           const status = String(item.状态 || '').trim();
-          return /摆件|玩具|玩偶|石膏|木雕|objects|日常|杂货/i.test(cate) && status !== '已售罄';
+          return codeCate === 'objects' && status !== '已售罄';
         });
       } else if (pageName === 'archive') {
-        filteredData = globalProducts.filter(item => String(item.状态 || '').trim() === '已售罄');
+        // 💡 核心修改点：在 ARCHIVE 页面，只有当状态是“已售罄”并且 H 列填了“展示”两个字时，才会放行显示
+        filteredData = globalProducts.filter(item => {
+          const status = String(item.状态 || '').trim();
+          const isShow = String(item.展示控制 || '').trim() === '展示';
+          return status === '已售罄' && isShow;
+        });
       }
 
       renderGrid(filteredData, pageName === 'archive');
@@ -183,24 +201,25 @@
       items.forEach(item => {
         const soldOut = isArchiveView || String(item.状态 || '').trim() === "已售罄";
         const card = document.createElement("div");
-        card.className = "group flex flex-col justify-between overflow-hidden bg-transparent rounded-none shadow-none cursor-pointer";
+        card.className = "group flex flex-col justify-between overflow-hidden bg-transparent rounded-none shadow-none cursor-pointer w-full";
         
         const firstImg = getSafeImageUrl(item.图片, fallbackImg);
 
+        // 手机端标题 text-[11px]，高度死死锁定为 h-[2.2rem]，强制首行字水平完美对齐
         card.innerHTML = `
           <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-3 md:mb-4 rounded-none">
             <img src="${firstImg}" alt="${item.标题 || ''}" referrerpolicy="no-referrer"
                  class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.03]" 
                  onerror="this.src='${fallbackImg}'"/>
           </div>
-          <div class="flex justify-between items-start text-[10px] md:text-sm tracking-wide px-0.5">
+          <div class="flex justify-between items-start text-[11px] md:text-sm tracking-wide px-0.5">
             <h2 class="font-bold text-[#000000] max-w-[70%] text-left leading-relaxed h-[2.2rem] md:h-[3rem] line-clamp-2 overflow-hidden">${item.标题 || '未命名选物'}</h2>
             <div class="text-right font-bold text-[#000000] pl-1.5 shrink-0">
               ${soldOut ? `<span class="text-red-800 italic font-bold">(Sold)</span>` : `<span>${item.价格 || ''}</span>`}
             </div>
           </div>
         `;
-        
+
         card.addEventListener('click', () => openModal(item));
         container.appendChild(card);
       });
@@ -218,7 +237,8 @@
       if (item.图片 && item.图片.trim() !== "") {
         const parsedImgs = item.图片.split(',')
           .map(u => u.replace(/[\u200B-\u200D\uFEFF]/g, '').trim())
-          .filter(u => u !== "");
+          .filter(u => u !== "")
+          .map(u => encodeURI(u));
         if (parsedImgs.length > 0) imgs = parsedImgs;
       }
       
@@ -226,7 +246,7 @@
 
       modalContent.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-          <div class="flex flex-col gap-6 max-h-[70vh] overflow-y-auto no-scrollbar pr-1">
+          <div class="flex flex-col gap-6 max-h-[60vh] md:max-h-[70vh] overflow-y-auto no-scrollbar pr-1">
             ${imgs.map(url => `
               <div class="bg-[#F5F5F3] aspect-[3/4] w-full">
                 <img src="${url}" referrerpolicy="no-referrer" class="w-full h-full object-cover" onerror="this.src='${fallbackImg}'"/>
@@ -236,16 +256,16 @@
           
           <div class="flex flex-col justify-between h-full py-2">
             <div>
-              <h2 class="text-xl font-bold tracking-widest text-[#000000] mb-3 leading-relaxed">${item.标题 || '未命名选物'}</h2>
-              <div class="text-base font-bold tracking-widest mb-8 pb-4 border-b border-gray-200 text-[#000000]">
+              <h2 class="text-lg md:text-xl font-bold tracking-widest text-[#000000] mb-3 leading-relaxed">${item.标题 || '未命名选物'}</h2>
+              <div class="text-sm md:text-base font-bold tracking-widest mb-6 md:mb-8 pb-4 border-b border-gray-200 text-[#000000]">
                 ${soldOut ? `<span class="text-red-800 italic">(Sold Out / 已售罄)</span>` : `<span>${item.价格 || ''}</span>`}
               </div>
-              <div class="text-sm tracking-wider text-black leading-loose font-medium whitespace-pre-line px-1">
+              <div class="text-xs md:text-sm tracking-wider text-black leading-loose font-medium whitespace-pre-line px-1">
                 ${item.详情 || 'No individual details available / 暂无详细描述'}
               </div>
             </div>
             
-            <div class="mt-12">
+            <div class="mt-8 md:mt-12">
               <div onclick="${soldOut ? '' : 'switchPage(\'about\'); closeMenu();'}" class="w-full text-center border-2 border-[#000000] py-3.5 text-xs tracking-widest uppercase font-bold inquire-btn ${soldOut ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-[#000000] text-white hover:bg-white hover:text-[#000000] cursor-pointer'}">
                 ${soldOut ? 'PIECE SOLD OUT' : 'GET CONTACT ON ABOUT PAGE / 查看店主微信'}
               </div>
