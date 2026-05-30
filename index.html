@@ -188,19 +188,19 @@
         const firstImg = getSafeImageUrl(item.图片, fallbackImg);
 
         card.innerHTML = `
-          <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-4 rounded-none">
+          <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-3 md:mb-4 rounded-none">
             <img src="${firstImg}" alt="${item.标题 || ''}" referrerpolicy="no-referrer"
                  class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.03]" 
                  onerror="this.src='${fallbackImg}'"/>
           </div>
-          <div class="flex justify-between items-start text-sm tracking-wide px-1">
-            <h2 class="font-bold text-[#000000] max-w-[70%] text-left leading-relaxed">${item.标题 || '未命名选物'}</h2>
-            <div class="text-right font-bold text-[#000000] pl-2 shrink-0">
+          <div class="flex justify-between items-start text-xs md:text-sm tracking-wide px-0.5">
+            <h2 class="font-bold text-[#000000] max-w-[70%] text-left leading-relaxed h-[2.5rem] md:h-[3rem] line-clamp-2 overflow-hidden">${item.标题 || '未命名选物'}</h2>
+            <div class="text-right font-bold text-[#000000] pl-1.5 shrink-0">
               ${soldOut ? `<span class="text-red-800 italic font-bold">(Sold)</span>` : `<span>${item.价格 || ''}</span>`}
             </div>
           </div>
         `;
-
+        
         card.addEventListener('click', () => openModal(item));
         container.appendChild(card);
       });
