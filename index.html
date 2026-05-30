@@ -41,7 +41,7 @@
     .page-content { display: none; }
     .page-content.active { display: block; }
     
-    /* 分类导航栏激活状态，线条加粗，颜色加深 */
+    /* 分类导航栏激活状态 */
     .nav-link.active { border-bottom: 2px solid #000000; color: #000000; font-weight: 700; }
   </style>
 </head>
@@ -103,8 +103,7 @@
   </div>
 
   <script>
-    // 💡 这是为你拼写好的、国内直接通畅连接腾讯文档数据的专用接口代码
-const csvUrl = "https://docs.qq.com/dop/opp/downloadObj?id=DUW9LSERzZE1Od2Nq&type=csv";
+    const csvUrl = "https://docs.qq.com/dop/opp/downloadObj?id=DUW9LSERzZE1Od2Nq&type=csv";
     
     let globalProducts = []; 
 
@@ -116,15 +115,16 @@ const csvUrl = "https://docs.qq.com/dop/opp/downloadObj?id=DUW9LSERzZE1Od2Nq&typ
       complete: function(results) {
         const rawRows = results.data.slice(1); 
         globalProducts = rawRows.map(row => {
-          if (!row || row.length < 2) return null;
+          if (!row || row.length < 4) return null; // 确保至少有基本数据
           return {
-            标题: row[0], // A列
-            图片: row[1], // B列
-            价格: row[2], // C列
-            状态: row[3], // D列
-            详情: row[4], // E列
-            分类: row[6], // G列
-            展示控制: row[7] // H列 💡 新增：强行读取表格第 H 列的“展示”开关
+            标题: row[0],     // A列
+            图片: row[1],     // B列
+            价格: row[2],     // C列
+            状态: row[3],     // D列
+            详情: row[4],     // E列
+            细分类别: row[5], // F列 (如“戒指”)
+            分类: row[6],     // G列 (💡 关键修正：对应腾讯表格的“代码分类”列)
+            展示控制: row[7]   // H列 (💡 关键修正：对应腾讯表格的“展示”列)
           };
         }).filter(item => item && (item.标题 || item.图片));
 
@@ -164,7 +164,6 @@ const csvUrl = "https://docs.qq.com/dop/opp/downloadObj?id=DUW9LSERzZE1Od2Nq&typ
           return codeCate === 'objects' && status !== '已售罄';
         });
       } else if (pageName === 'archive') {
-        // 💡 核心修改点：在 ARCHIVE 页面，只有当状态是“已售罄”并且 H 列填了“展示”两个字时，才会放行显示
         filteredData = globalProducts.filter(item => {
           const status = String(item.状态 || '').trim();
           const isShow = String(item.展示控制 || '').trim() === '展示';
@@ -206,7 +205,6 @@ const csvUrl = "https://docs.qq.com/dop/opp/downloadObj?id=DUW9LSERzZE1Od2Nq&typ
         
         const firstImg = getSafeImageUrl(item.图片, fallbackImg);
 
-        // 手机端标题 text-[11px]，高度死死锁定为 h-[2.2rem]，强制首行字水平完美对齐
         card.innerHTML = `
           <div class="w-full aspect-[3/4] bg-[#F5F5F3] overflow-hidden relative mb-3 md:mb-4 rounded-none">
             <img src="${firstImg}" alt="${item.标题 || ''}" referrerpolicy="no-referrer"
