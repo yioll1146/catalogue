@@ -193,8 +193,8 @@
                  class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.03]" 
                  onerror="this.src='${fallbackImg}'"/>
           </div>
-          <div class="flex justify-between items-start text-xs md:text-sm tracking-wide px-0.5">
-            <h2 class="font-bold text-[#000000] max-w-[70%] text-left leading-relaxed h-[2.5rem] md:h-[3rem] line-clamp-2 overflow-hidden">${item.标题 || '未命名选物'}</h2>
+          <div class="flex justify-between items-start text-[10px] md:text-sm tracking-wide px-0.5">
+            <h2 class="font-bold text-[#000000] max-w-[70%] text-left leading-relaxed h-[2.2rem] md:h-[3rem] line-clamp-2 overflow-hidden">${item.标题 || '未命名选物'}</h2>
             <div class="text-right font-bold text-[#000000] pl-1.5 shrink-0">
               ${soldOut ? `<span class="text-red-800 italic font-bold">(Sold)</span>` : `<span>${item.价格 || ''}</span>`}
             </div>
